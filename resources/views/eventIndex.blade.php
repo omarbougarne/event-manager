@@ -11,16 +11,17 @@
             </div>
 
             <div class="grid grid-cols-1 gap-8 mt-8 md:mt-16 md:grid-cols-2">
-                @foreach ($events as $event)
+                @foreach ($categories as $category)
                     <div class="lg:flex bg-slate-100 rounded-md text-black">
-                        <img class="object-cover w-full h-56 rounded-lg lg:w-64"
-                            src="{{ asset('/images/' . $event->image) }}" alt="{{ $event->title }}">
-
+                        <h2 class="text-xl font-semibold text-gray-800 hover:underline">{{ $category->name }}</h2>
                         <div class="flex flex-col justify-between py-6 lg:mx-6">
-                            <a href="{{ route('eventShow', $event->id) }}"
-                                class="text-xl font-semibold text-gray-800 hover:underline ">
-                                {{ $event->title }}
-                            </a>
+                            <ul>
+                                @foreach ($category->events as $event)
+                                    <li>
+                                        <a href="{{ route('eventShow', $event->id) }}" class="text-lg font-semibold text-gray-800 hover:underline">{{ $event->title }}</a>
+                                    </li>
+                                @endforeach
+                            </ul>
                         </div>
                     </div>
                 @endforeach

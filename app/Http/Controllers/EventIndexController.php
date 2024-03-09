@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\Category;
 
 class EventIndexController extends Controller
 {
@@ -11,7 +12,9 @@ class EventIndexController extends Controller
      */
     public function __invoke()
     {
-        $events = Event::all()->sortBy('desc');
-        return view('eventIndex', compact('events'));
+        $events = Event::all();
+        $categories = Category::with('events')->get();
+
+        return view('eventIndex', compact('events', 'categories'));
     }
 }

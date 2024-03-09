@@ -19,6 +19,7 @@ class EventController extends Controller
      */
     public function index(Request $request): View
 {
+    $categories = Category::all();
     $query = $request->input('query');
     $events = Event::query();
 
@@ -28,8 +29,10 @@ class EventController extends Controller
 
     $events = $events->get();
 
-    return view('events.index', compact('events'));
+    return view('events.index', compact('events', 'categories'));
 }
+
+
 
 
     /**
@@ -37,8 +40,9 @@ class EventController extends Controller
      */
     public function create(): View
     {
+        $categories = Category::all();
 
-        return view('events.create');
+        return view('events.create', compact('categories'));
     }
 
     /**
@@ -48,41 +52,47 @@ class EventController extends Controller
     $categories = Category::all();
     return $categories;
 }
-    public function store(Request $request)
-    {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date',
-            'start_time' => 'required|date_format:H:i',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'address' => 'required|string',
-            'num_tickets' => 'required|integer',
-        ]);
+public function store(Request $request)
+{
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'description' => 'required|string',
+        'start_date' => 'required|date',
+        'end_date' => 'required|date',
+        'start_time' => 'required|date_format:H:i',
+        'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'address' => 'required|string',
+        'num_tickets' => 'required|integer',
+        'categories' => 'array', // Ensure categories are provided as an array
+    ]);
 
-        $imageName = time().'.'.$request->image->extension();
-        $request->image->move(public_path('images'), $imageName);
+    // Move the uploaded image to public storage
+    $imageName = time().'.'.$request->image->extension();
+    $request->image->move(public_path('images'), $imageName);
 
-        $event = new Event();
-        $event->title = $request->input('title');
-        $event->description = $request->input('description');
-        $event->start_date = $request->input('start_date');
-        $event->end_date = $request->input('end_date');
-        $event->start_time = $request->input('start_time');
-        $event->image = $imageName;
-        $event->address = $request->input('address');
-        $event->num_tickets = $request->input('num_tickets');
-        $event->user_id = auth()->id();
-        if ($request->has('categories')) {
-            $category_id = $request->input('categories');
-            $event->categories()->attach($category_id);
-        }
+    $event = new Event([
+        'title' => $request->input('title'),
+        'description' => $request->input('description'),
+        'start_date' => $request->input('start_date'),
+        'end_date' => $request->input('end_date'),
+        'start_time' => $request->input('start_time'),
+        'image' => $imageName,
+        'address' => $request->input('address'),
+        'num_tickets' => $request->input('num_tickets'),
+        'user_id' => auth()->id(),
+    ]);
 
-        $event->save();
 
-        return back();
+    $event->save();
+
+    if ($request->has('categories')) {
+        $categoryIds = $request->input('categories');
+        $event->categories()->attach($categoryIds);
     }
+
+    return back()->with('success', 'Event created successfully.');
+}
+
 
 
     /**

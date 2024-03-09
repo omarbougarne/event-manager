@@ -105,12 +105,13 @@
                         @enderror
                     </div>
                     <div class="mb-4">
-                        <label for="categories" class="block text-gray-700">Categories</label>
-                        <select name="categories[]" id="categories" multiple class="form-multiselect block w-full">
-                            @foreach($events as $event)
-                            <option value="{{ $category->id }}">{{ $category->name }}</option>
-                            @endforeach
-                        </select>
+                        <label for="categories" class="block text-white">Categories</label>
+                        @foreach ($categories as $category)
+                            <div class="flex items-center">
+                                <input type="checkbox" name="categories[]" id="category{{ $category->id }}" value="{{ $category->id }}" class="mr-2">
+                                <label class=" text-white" for="category{{ $category->id }}">{{ $category->name }}</label>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
                 <div>
